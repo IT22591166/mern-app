@@ -10,20 +10,19 @@ app.use(express.json());
 app.use(cors()); // Allow frontend requests
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/mern_db', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+mongoose.connect('mongodb://localhost:27017/MernHealth', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ MongoDB connected to MernHealth database'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Health Data Schema
-const HealthDataSchema = new mongoose.Schema({
+const healthDataSchema = new mongoose.Schema({
   name: String,
   bloodPressure: String,
   sugarLevel: String,
   heartRate: String,
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
 });
 
-const HealthData = mongoose.model('HealthData', HealthDataSchema);
+const HealthData = mongoose.model('HealthData', healthDataSchema, 'mernapp');
 
 // Endpoint to receive health data
 app.post('/api/health-data', async (req, res) => {
@@ -39,9 +38,10 @@ app.post('/api/health-data', async (req, res) => {
 // Endpoint to fetch all health reports
 app.get('/api/reports', async (req, res) => {
   try {
-    const reports = await HealthData.find();
+    const reports = await HealthData.find(); // Use HealthData model to fetch data
     res.json(reports);
   } catch (error) {
+    console.error('Error fetching reports:', error); // Log the error
     res.status(500).json({ error: 'Failed to fetch reports' });
   }
 });
